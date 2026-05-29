@@ -4,6 +4,8 @@ bilibili @ [黄水果天下第一](https://space.bilibili.com/535122654)
 
 基于 [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS) 训练的《白色相簿2》冬马和纱 / 小木曾雪菜 TTS 模型，以及配套的 OpenAI 兼容 TTS 服务端。可直接使用模型合成语音，也适用于酒馆聊天。
 
+模型下载链接: [百度网盘](https://pan.baidu.com/s/1JM8gUwESh9xersxXu0likw?pwd=0528) 提取码 0528
+
 ## 功能介绍
 
 ### 1. TTS 模型
