@@ -8,21 +8,21 @@ import soundfile as sf
 from flask import Flask, request, send_file
 from openai import OpenAI
 
-parser = argparse.ArgumentParser(description="GPT-SoVITS OpenAI Compatible Server")
+parser = argparse.ArgumentParser(description="GPT-SoVITS OpenAI Compatible TTS Server")
 parser.add_argument("-b", "--base_path", required = True, help = "GPT-SoVITS 整合包安装的根目录 | Root path of GPT-SoVITS.")
 parser.add_argument("-d", "--device", default = "0", help = "Use which CUDA gpu to do TTS inference. Enter one number.")
 parser.add_argument("-p", "--listen_port", default = "5000", help = "TTS Service listening port. Default = 5000")
 parser.add_argument("-u", "--url", default = "http://localhost:1234/v1", help = "URL to OpenAI Compatible LLM inference server. Default = http://localhost:1234/v1")
 parser.add_argument("-k", "--key", default = "not-need", help = "API Key to access LLM server.")
 parser.add_argument("-m", "--model", help = "Model identifier for LLM server. If not given, will use the first model in client.models.list()")
-parser.add_argument("-t", "--no_translate", action = "store_true", help = "If set, input texts will NOT be parsed and translated into Japanese before TTS.")
-parser.add_argument("-c", "--character", default = "set", choices=["set", "kaz"], help = "Choosing character from Kazusa(kaz) and Setsuna(set).")
-parser.add_argument("-r", "--no_recognition", action = "store_true", help = "If set, will NOT automatically choose reference audio and text corresponding to input text emotion, which means generated voices can be less emotional but much more consistent. Can't be used with -ref_audio and -ref_text given.")
+parser.add_argument("-t", "--no_translate", action = "store_true", help = "If set, input texts will NOT be parsed into dialogues and then translated into Japanese before TTS.")
+parser.add_argument("-c", "--character", default = "set", choices=["set", "kaz"], help = "Choosing character preset from Kazusa(kaz) and Setsuna(set).")
+parser.add_argument("-r", "--no_recognition", action = "store_true", help = "If set, will NOT automatically choose reference audio and text corresponding to input text emotion, which means generated voices can be less emotional but much more consistent. If not set(default), -ref_audio and -ref_text should NOT be given.")
 parser.add_argument("-f", "--use_full_precision", action = "store_true", help = "Use full precision instead of half.")
-parser.add_argument("--gpt_model", help = "Manually specify which gpt model to use. If not given, will automatically chose from Kazusa or Setsuna.")
-parser.add_argument("--sovits_model", help = "Manually specify which sovits model to use. If not given, will automatically chose from Kazusa or Setsuna.")
-parser.add_argument("--ref_audio", help="Path to the reference audio file")
-parser.add_argument("--ref_text", help="Reference text")
+parser.add_argument("--gpt_model", help = "Manually specify which gpt model to use. If not given, will automatically choose from Kazusa or Setsuna.")
+parser.add_argument("--sovits_model", help = "Manually specify which sovits model to use. If not given, will automatically choose from Kazusa or Setsuna.")
+parser.add_argument("--ref_audio", help="Path to the reference audio file. Must be given with --no_recognition set.")
+parser.add_argument("--ref_text", help="Reference text. Must be given with --no_recognition set.")
 parser.add_argument("--ref_language", default = "日文", choices=["中文", "英文", "日文"], help="Language of reference audio")
 args = parser.parse_args()
 
@@ -34,8 +34,8 @@ if not os.path.exists(GPT_SOVITS_INSTALL_PATH):
 if (args.ref_audio == None and args.ref_text != None) or (args.ref_text == None and args.ref_audio != None):
     print("-ref_audio and -ref_text must be given at the same time, or both be left blank.")
     exit(1)
-if args.ref_audio != None and args.no_recognition:
-    print("no_recognition can't be used with -ref_audio and -ref_text given")
+if args.ref_audio != None and not args.no_recognition:
+    print("Recognition can't be used with -ref_audio and -ref_text given. Please set --no_recognition to manually specify ref audio and text.")
 print(f"Translation:{not args.no_translate} | Recognition:{not args.no_recognition}")
 print("Character Preset: " + args.character)
 
